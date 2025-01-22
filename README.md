@@ -15,7 +15,7 @@ Assuptions:
     Injected rows and original rows can be differentiated by their infusion sequence of non-digit bytes.
     Images are atleast a 2x2 grid
   Corruption -
-    The corrupted images originate from "plain" PGM files
+    The corrupted images originate from "plain" PGM files(P2)
     Each original row is terminated by a newline character (\n) that remains unchanged.
     Corruption does not alter the row order but adds extra rows
   
