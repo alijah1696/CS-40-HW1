@@ -55,7 +55,7 @@ char* increase_cap (char* buffer, size_t capacity)
 {
     char* new_buff = realloc(buffer, capacity);
 
-    if (new_buffer == NULL) {
+    if (new_buff == NULL) {
         fprintf(stderr, "Memory reallocation failed\n");
         free(buffer);
         exit(1);
