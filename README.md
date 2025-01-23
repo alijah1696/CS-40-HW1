@@ -25,6 +25,51 @@ Constraints:
 
 
 Architecture:
+For readaline, we will be using a pointer to char called buffer to store the characters. Buffer stops receiving input when finding the endline character. 
+
+For the restoration part, we need 2 data structures: a matrix in numbers matrix_nums (a pointer to pointer to integer), which will represent the final, restored p2 pgm file, and a pointer to char, which will store Hanson's atoms. We prefer this implementation over a pointer to a pointer to char because Atoms allow pointer equality. Since the lines from the original file have been injected with the same sequence of characters, all atoms we store must be equal.
+
+We will use the readaline function to read the corrupted file line by line. The input will be separated into 2 parts: matrix[i] (a pointer to int, where we store the numbers from the input line) and atoms[i] (where we store anything else). After every line iteration, we check if we found any 2 equal atoms (which should be easy considering atoms allow pointer equality). We repeat the process until we find 2 equal atoms, atoms[x] and atoms[y]. We delete all the lines from both data structures besides x and y.
+
+Now that we know the correct sequence of characters with which the original lines have been injected, we simply need to check every corrupted line individually and store the numbers in matrix_nums if the sequence matches. 
+
+Pseudocode overview:
+
+//func to separate numbers from characters
+while ( reading ch from the corrupted line):
+	char* seq_chars = NULL
+
+	if ch is digit:
+		append ch to matrix_nums[size_matrix][i]
+		i++
+	else:
+		append ch to seq_chars
+
+	
+	atoms[size_atoms] = Atom_string(seq_chars)
+	size_atoms++
+	
+
+
+//func to check equal sequences
+for (i: 0 -> size_atoms-1):
+	for (j: i+1 -> size_atoms):
+		if atoms[i] == atoms[j]
+			found the correct sequence of charcaters, return [i, j], delete all rows besides i and j
+
+return [-1, -1]
+
+
+
+In the end, matrix_nums should represent the original file, which can safely be converted to a binary format.
+
+
+Data structures used:
+- char* buffer
+- int** matrix_nums
+- char* atoms (its elements will be initialized with atoms[x] = Atom_string("sequence_of_injected_characters")
+
+All data structures are allocated dynamically so that they can be resized.
 
 
 Implementations:
