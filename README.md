@@ -10,7 +10,7 @@ Use Cases:
   Validate input files for structural integrity.
   Efficiently read files containing arbitrary-length lines
 
-Assuptions:
+Assumptions:
   Input - 
     Injected rows and original rows can be differentiated by their infusion sequence of non-digit bytes.
     Images are atleast a 2x2 grid
@@ -22,6 +22,21 @@ Assuptions:
 Constraints:
   The restoration program should process even large images efficiently under 20 seconds
   Hanson’s data structures are available and must be used when appropriate(except for arrays)
+
+
+Implementations:
+  Reading File-
+
+  Restoration-
+  
+  Conversion-
+    opening the input and output file and checking if the input file is in the correct "P2" format. 
+    skip any comments present in the file and read the image dimensions and maximum pixel value.
+    write the appropriate "P5" header to the output file 
+    read each pixel value from the P2 file and write it in binary format to the P5 file.
+    closes the file
+
+
   
   
 
