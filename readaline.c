@@ -38,7 +38,7 @@ size_t readaline(FILE *inputfd, char **datapp)
 
     if (count > 0)
     {
-        buffer[count + 1] = '\0';
+        buffer[count] = '\0';
 
         *datapp = buffer;
 
