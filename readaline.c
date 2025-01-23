@@ -4,22 +4,63 @@
 
 size_t readaline(FILE *inputfd, char **datapp)
 {
+    if (inputfd == NULL || datapp == NULL) {
+        fprintf(stderr, "Runtime error\n");
+        exit(1);
+    }
+
     size_t count = 0;
-    int ch;
+    size_t capacity = 1001;
+    char ch;
+    char *buffer = malloc(capacity);
+
     while ((ch = fgetc(inputfd)) != EOF) { 
-        
 
+        if (count == 1001)
+        {
+            buffer[++count] = '\n';
+            return count;
+        }
+           
 
-        *datapp[count] = ch;
+        buffer[count] = ch;
+        count++;
+
+        if (ch == '\n')
+            break;
     }
 
     if (ferror(inputfd)) {
-        perror("Error reading from file");
+        fprintf(stderr, "Error reading from the file\n");
         fclose(inputfd);
-        return EXIT_FAILURE;
+        exit(1);
+    }    
+
+    if (count > 0)
+    {
+        buffer[count + 1] = '\0';
+
+        *datapp = buffer;
+
+        return count;
+    }
+    else
+    {
+        free(buffer);
+        return 0;
+    }
+}
+
+char* increase_cap (char* buffer, size_t capacity)
+{
+    char* new_buff = realloc(buffer, capacity);
+
+    if (new_buffer == NULL) {
+        fprintf(stderr, "Memory reallocation failed\n");
+        free(buffer);
+        exit(1);
     }
 
-    fclose(inputfd);
-
-    return count;
+    return new_buff;
 }
+
