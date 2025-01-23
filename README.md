@@ -44,7 +44,6 @@ while ( reading ch from the corrupted line):
 		i++
 	else:
 		append ch to seq_chars
-
 	
 	atoms[size_atoms] = Atom_string(seq_chars)
 	size_atoms++
@@ -55,7 +54,7 @@ while ( reading ch from the corrupted line):
 for (i: 0 -> size_atoms-1):
 	for (j: i+1 -> size_atoms):
 		if atoms[i] == atoms[j]
-			found the correct sequence of charcaters, return [i, j], delete all rows besides i and j
+			found the correct sequence of characters, return [i, j], delete all rows besides i and j
 
 return [-1, -1]
 
