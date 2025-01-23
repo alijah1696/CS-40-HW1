@@ -25,7 +25,7 @@ Constraints:
 
 
 Implementations:
-  Reading File-
+  readaline- The readaline function reads characters one by one from the input file and stores them in a buffer (the buffer is allocatede dinamically so as its size can change). The loop stops if it encounters the endline character or the end of file. Then *datapp gets uptated and the size of buffer is returned. If the size is 0 (meaning we no characters have been read, and thus we reached the end of line), buffer is freed and the function returns 0.
 
   Restoration-
   
