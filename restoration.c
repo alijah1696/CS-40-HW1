@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "atom.h"
+#include "conversion.h"
 
 
 void create_array_atoms()
@@ -18,4 +19,5 @@ void create_array_atoms()
 int main()
 {
   create_array_atoms();
+  exampleConversion();
 }
