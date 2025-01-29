@@ -13,9 +13,10 @@
 
 // int main()
 // {
-//     test_separate_extended();
+//     test_separate_special();
 //     return 0;
 // }
+
 
 int main(int argc, char *argv[]) 
 {
@@ -41,11 +42,11 @@ int main(int argc, char *argv[])
 
         while ((len = readaline(file, &line)) > 0) 
         {
-            printf("\n");
-            printf("len: %zu", len);
-            printf("\n");
-            printf("Current line\n");
-            printf("%s\n", line);
+            // printf("\n");
+            // printf("len: %zu", len);
+            // printf("\n");
+            // printf("Current line\n");
+            // printf("%s\n", line);
             total_corrupted_lines++;
             if (ok == 0)
             {
@@ -86,28 +87,43 @@ int main(int argc, char *argv[])
             free(line);
         }
 
-        printf("%d", total_corrupted_lines);
+        printf("total_corrupted_lines: %d", total_corrupted_lines);
         printf("\n");
-        printf("%d", Seq_length(matrix));
+        printf("Matrix length: %d", Seq_length(matrix));
         printf("\n");
-        printf("%d", false_lines);
+        printf("False lines: %d", false_lines);
         printf("\n");
 
         assert(total_corrupted_lines - Seq_length(matrix) == false_lines);
         fclose(file);
-
+        
         printf("\n");
         printf("%s", "Final matrix\n");
         printing_matrix(matrix);
 
-        for (size_t i = 0; i < (size_t)Seq_length(matrix); i++){
-            Seq_T row = (Seq_T)Seq_get(matrix, i);
+        for (int i = 0; i < Seq_length(matrix); i++) {
+            Seq_T row = Seq_get(matrix, i);
+            // printf("\n");
+            // printf("Now working on row: %d\n", i);
+            for (int j = 0; j < Seq_length(row); j++) {
+                int *num = Seq_get(row, j);
+                free(num); 
+                // printf("Freed successfully for %d\n", j);
+            }
+
             Seq_free(&row);
+            // printf("Freed successfully the row at %d\n", i);
         }
-
         Seq_free(&matrix);
-        Seq_free(&atom_sequence);
+        printf("Freed successfully the matrix\n");
 
+        // for (size_t j = 0; j < (size_t)Seq_length(atom_sequence); j++) {
+        //     char *atom = Seq_get(atom_sequence, j);
+        //     free(atom);
+        //     printf("Freed successfully for atom at %zu\n", j);
+        // }
+        // Seq_free(&atom_sequence);
+        // printf("Freed successfully the atom_sequence\n");
 
         return 0;
     }
@@ -117,5 +133,4 @@ int main(int argc, char *argv[])
         return 1;
     }
 }
-
 
