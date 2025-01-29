@@ -57,23 +57,31 @@ int diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix,
         exit(1);
     }
 
+    // Create a new function to only check the atom == correct_atom statement
     int size_atom = separate(line, newRow, atom_val);
 
     const char *atom = Atom_new(atom_val, size_atom);
 
     if (atom == correct_atom)
     {
-        printf("Printing Seq_length(newRow): %d\n", Seq_length(newRow));
-        printf("The width is: %d\n", width);
+        // printf("Printing Seq_length(newRow): %d\n", Seq_length(newRow));
+        // printf("The width is: %d\n", width);
 
-        //line 68 bellow
         assert(Seq_length(newRow) == width);
 
         Seq_addhi(atom_sequence, (void *) atom);
         Seq_addhi(matrix, newRow);
     }
     else
+    {
+        int length = Seq_length(newRow);
+        for (int i = 0; i < length; i++) {
+            free(Seq_get(newRow, i)); // each is an int*, so free it
+        }
+        Seq_free(&newRow);
         fl++;
+    }
+        
 
     free(atom_val);
 
@@ -105,6 +113,11 @@ int separate(const char* line, Seq_T newRow, char* atom_val)
                 {
                     num[length] = ch;
                     length++;
+                    if (length >= 5) {
+                        printf("Number exceeds 3 digits: %s\n", num);
+                        free(num);
+                        exit(1); 
+                    }
                 }
                 else
                 {     
@@ -122,19 +135,19 @@ int separate(const char* line, Seq_T newRow, char* atom_val)
             int *number_ptr = malloc(sizeof(*number_ptr));
             if (!number_ptr) {
                 perror("Failed to allocate memory for number_ptr\n");
-                free(num); // Freeing num before exiting
+                free(num);
                 exit(1);
             }
 
             *number_ptr = atoi(num);
-            free(num);  // ✅ Free num after conversion
+            free(num); 
 
-            printf("The number_ptr value is %d\n", *number_ptr);
+            //printf("The number_ptr value is %d\n", *number_ptr);
 
             assert(-1 < *number_ptr);
             assert(*number_ptr < 256);
 
-            Seq_addhi(newRow, number_ptr); // Make sure newRow frees memory later
+            Seq_addhi(newRow, number_ptr);
 
             if (ch == '\n') {
                 break;
@@ -182,20 +195,33 @@ int check_atoms(Seq_T atom_sequence, const char* atom)
 
 Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index)
 {
-    if (index < 0 || index >= size_matrix) {
-        fprintf(stderr, "Index %d out of bounds for matrix of size %d\n", index, size_matrix);
-        exit(1);
+    // 1. Build the new matrix with the two “correct” rows
+    Seq_T new_matrix = Seq_seq(Seq_get(matrix, index),
+                               Seq_get(matrix, size_matrix - 1),
+                               NULL);
+
+    // 2. Free all other rows
+    //    (Don’t free the rows at index and size_matrix-1 
+    //     because they're in new_matrix)
+    for (int i = 0; i < size_matrix; i++) {
+        if (i != index && i != size_matrix - 1) {
+            Seq_T row = Seq_get(matrix, i);
+            int length = Seq_length(row);
+            for (int j = 0; j < length; j++) {
+                int *number_ptr = Seq_get(row, j);
+                free(number_ptr); 
+            }
+            Seq_free(&row);
+        }
     }
 
-    if (size_matrix <= 0) {
-        fprintf(stderr, "Invalid size_matrix: %d\n", size_matrix);
-        exit(1);
-    }
+    // 3. Now free the old matrix
+    Seq_free(&matrix);
 
-    Seq_T new_matrix = 
-            Seq_seq(Seq_get(matrix, index), Seq_get(matrix, size_matrix - 1), NULL);
+    // 4. Return the new one
     return new_matrix;
-} 
+}
+
 
 
 // For testing purposes
