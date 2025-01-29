@@ -30,7 +30,7 @@ size_t readaline(FILE *inputfd, char **datapp) {
         if (length > 1000)
         {
             fprintf(stderr, "readaline: input line too long\n");
-            exit(EXIT_FAILURE);
+            exit(4);
         }
     
         buffer[length++] = (unsigned char)ch;
@@ -39,17 +39,7 @@ size_t readaline(FILE *inputfd, char **datapp) {
             break;
         }
 
-        // if (length >= capacity) {
-        //     size_t new_capacity = capacity * 2;
-        //     unsigned char *temp = realloc(buffer, new_capacity);
-        //     if (!temp) {
-        //         free(buffer);
-        //         fprintf(stderr, "readaline: memory (re)allocation failed\n");
-        //         exit(EXIT_FAILURE);
-        //     }
-        //     buffer = temp;
-        //     capacity = new_capacity;
-        // }
+
     }
 
     if (length == 0) 
@@ -70,8 +60,34 @@ size_t readaline(FILE *inputfd, char **datapp) {
         buffer = temp;
         capacity++;
     }
-    buffer[length] = '\0';
+    // buffer[length] = '\0';
 
     *datapp = (char *)buffer;
-    return length;
+    return length - 1;
 }
+
+        // if (length >= capacity) {
+        //     size_t new_capacity = capacity * 2;
+        //     unsigned char *temp = realloc(buffer, new_capacity);
+        //     if (!temp) {
+        //         free(buffer);
+        //         fprintf(stderr, "readaline: memory (re)allocation failed\n");
+        //         exit(EXIT_FAILURE);
+        //     }
+        //     buffer = temp;
+        //     capacity = new_capacity;
+        // }
+
+// char* increase_cap (char* buffer, size_t capacity)
+// {
+//     char* new_buff = realloc(buffer, capacity);
+
+//     if (new_buff == NULL) {
+//         fprintf(stderr, "Memory reallocation failed\n");
+//         free(buffer);
+//         exit(1);
+//     }
+
+//     return new_buff;
+// }
+
