@@ -13,14 +13,15 @@
 
 
 int diff_nums_chars1(const char *line, Seq_T matrix, Seq_T atom_sequence);
-int diff_nums_chars2(const char* line, char* correct_atom, Seq_T matrix, 
+int diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix, 
                                                 Seq_T atom_sequence, int width);
-void separate(const char* line, Seq_T newRow, char* atom_val);
+int separate(const char* line, Seq_T newRow, char* atom_val);
 int check_atoms(Seq_T atom_sequence, const char* atom);
 Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index);
 
 //For testing
-void create_P2_file(Seq_T matrix);
+void printing_matrix(Seq_T matrix);
+void printing_atom_seq(Seq_T row);
 
 #endif
 
