@@ -82,6 +82,22 @@ clean:
 restoration: restoration.o readaline.o main.o
 	$(CC) $(LDFLAGS) -o restoration  restoration.o readaline.o main.o $(LDLIBS)
 
+test_restoration: test_restoration.o 
+
+# Build test for readaline
+test_readaline: test_readaline.o readaline.o
+	$(CC) $(LDFLAGS) -o test_readaline test_readaline.o readaline.o $(LDLIBS)
+
+# Build test for conversion function
+test_conversion: test_conversion.o conversion.o
+	$(CC) $(LDFLAGS) -o test_conversion test_conversion.o conversion.o $(LDLIBS)
+
+# Run unit tests
+test: test_conversion test_readaline test_restoration
+	./test_restoration
+	./test_readaline
+	./test_conversion
+	
 #
 # Other Shortcuts worth nothing
 # $@ takes the name of the build rule and inserts it into the command

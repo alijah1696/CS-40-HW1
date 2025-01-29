@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
-#include "seq.h"
-#include "conversion.h"
 
-int main() {
+int main(){
     return 0;
 }

@@ -3,6 +3,8 @@
 #include <string.h>
 #include <assert.h>
 #include "readaline.h"
+#include "time.h"
+
 
 // Helper function to create a temporary file
 FILE *create_temp_file(const char *content) {
@@ -47,6 +49,15 @@ void test_readaline_empty_file() {
     fclose(file);
 }
 
+void test_readaline_null_params() {
+    FILE *file = create_temp_file("Test\n");
+
+    assert(readaline(NULL, NULL) == 0); // Should exit or print an error
+    assert(readaline(file, NULL) == 0); // Should exit or print an error
+
+    fclose(file);
+}
+
 void test_readaline_long_line() {
     char long_line[1100];
     memset(long_line, 'A', 1000);
@@ -64,12 +75,33 @@ void test_readaline_long_line() {
     fclose(file);
 }
 
-void test_readaline_null_params() {
-    FILE *file = create_temp_file("Test\n");
+void test_readaline_large_line() {
+    char large_line[10001];
+    memset(large_line, 'A', 9999);
+    large_line[9999] = '\n';
+    large_line[10000] = '\0';
 
-    assert(readaline(NULL, NULL) == 0); // Should exit or print an error
-    assert(readaline(file, NULL) == 0); // Should exit or print an error
+    FILE *file = create_temp_file(large_line);
+    char *line = NULL;
 
+    // Start the timer
+    clock_t start_time = clock();
+
+    // Perform the computation
+    size_t length = readaline(file, &line);
+
+    // Stop the timer
+    clock_t end_time = clock();
+
+    // Calculate the elapsed time in seconds
+    double time_taken = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
+
+    assert(length == 10000);
+    assert(line[9999] == '\n');
+
+    printf("Time taken to read the line: %f seconds\n", time_taken);
+
+    free(line);
     fclose(file);
 }
 
@@ -77,6 +109,7 @@ int main() {
     test_readaline_normal_case();
     test_readaline_empty_file();
     test_readaline_long_line();
+    test_readaline_large_line();
     test_readaline_null_params();
 
     printf("All readaline tests passed!\n");

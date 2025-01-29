@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-unsigned char *generate_p5_pgm(int *pixels, int width, int height, int maxValue, size_t *output_size);
+void writeP5Header(int width, int height, FILE *file);
 
-int exampleConversion();
+void writeRowToBinary(Seq_T pixelRow, FILE *file);
 
 #endif
