@@ -101,11 +101,12 @@ int main(int argc, char *argv[])
         printing_matrix(matrix);
 
         for (size_t i = 0; i < (size_t)Seq_length(matrix); i++){
-            Seq_free((Seq_T)Seq_get(matrix, i));
+            Seq_T row = (Seq_T)Seq_get(matrix, i);
+            Seq_free(&row);
         }
 
-        Seq_free(matrix);
-        Seq_free(atom_sequence);
+        Seq_free(&matrix);
+        Seq_free(&atom_sequence);
 
 
         return 0;
