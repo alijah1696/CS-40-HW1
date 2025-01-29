@@ -90,25 +90,29 @@ int separate(const char* line, Seq_T newRow, char* atom_val)
     {
         if (isdigit((unsigned char)ch)) 
         {
+            printf("Reading the digit character: %c\n", ch);
             char *num = malloc(4);
 
             if (!num) {
-                perror("Failed to allocate memory for num");
+                perror("Failed to allocate memory for num\n");
                 exit(1);
             }
 
             num[0] = ch;
             int length = 1;
 
+            //Calculating the number
             while ((ch = *line++) != '\n')
             {
                 if (isdigit((unsigned char)ch))
                 {
+                    printf("Reading the digit character: %c\n", ch);
                     num[length] = ch;
                     length++;
                 }
                 else
-                {        
+                {     
+                    printf("Reading the non-digit character: %c\n", ch);   
                     num[length] = '\0';                
 
                     if (size_atom >= capacity - 1) 
@@ -116,6 +120,7 @@ int separate(const char* line, Seq_T newRow, char* atom_val)
                         fprintf(stderr, "atom_val buffer overflow\n");
                         exit(1);
                     }
+                    printf("Adding %c to atom_val\n", ch);
                     atom_val[size_atom++] = ch;
 
                     break;
@@ -123,9 +128,10 @@ int separate(const char* line, Seq_T newRow, char* atom_val)
                    
             }
 
+            printf("Calculating the number\n");
             int *number_ptr = malloc(sizeof(*number_ptr));
             if (!number_ptr) {
-                perror("Failed to allocate memory for number_ptr");
+                perror("Failed to allocate memory for number_ptr\n");
                 exit(1);
             }
 
@@ -134,19 +140,28 @@ int separate(const char* line, Seq_T newRow, char* atom_val)
             assert (-1 < *number_ptr);
             assert(*number_ptr < 256);
 
+            printf("Adding number %d to newRow.\n", *number_ptr);
             Seq_addhi(newRow, number_ptr);
+
+            if (ch == '\n') {
+                break;
+            }
         } 
         else 
-        {       
+        {   
+            printf("Reading the non-digit character: %c\n", ch);    
             if (size_atom >= capacity - 1) 
             {  
                 fprintf(stderr, "atom_val buffer overflow\n");
                 exit(1);
             }
+            printf("Adding %c to atom_val\n", ch);
             atom_val[size_atom++] = ch;
         }
     }
     atom_val[size_atom] = '\0';
+
+    printf("The execution finished\n");
     return size_atom;
 }
 
