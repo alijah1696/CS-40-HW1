@@ -8,7 +8,6 @@
 #include "restoration.h"
 
 
-//It is known that the lines of text have less than 1000 characters
 int diff_nums_chars1(const char *line, Seq_T matrix, Seq_T atom_sequence)
 {
     assert(line != NULL);
@@ -22,12 +21,17 @@ int diff_nums_chars1(const char *line, Seq_T matrix, Seq_T atom_sequence)
         exit(1);
     }
 
-    separate(line, newRow, atom_val);
+    int size_atom = separate(line, newRow, atom_val);
+
+    // printf("The value of atom_val is: %s\n", atom_val);
 
     Seq_addhi(matrix, newRow);
 
-    const char *atom = Atom_string(atom_val);
-    Seq_addhi(atom_sequence, atom);
+    const char *atom = Atom_new(atom_val, size_atom);
+
+    // printf("The value of atom is: %s\n", atom);
+
+    Seq_addhi(atom_sequence, (void *)atom);
 
     free(atom_val);
 
@@ -35,7 +39,8 @@ int diff_nums_chars1(const char *line, Seq_T matrix, Seq_T atom_sequence)
 }
 
 
-int diff_nums_chars2(const char* line, char* correct_atom, Seq_T matrix, 
+
+int diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix, 
                                                 Seq_T atom_sequence, int width)
 {
     assert(line != NULL);
@@ -52,15 +57,19 @@ int diff_nums_chars2(const char* line, char* correct_atom, Seq_T matrix,
         exit(1);
     }
 
-    separate(line, newRow, atom_val);
+    int size_atom = separate(line, newRow, atom_val);
 
-    const char *atom = Atom_string(atom_val);
+    const char *atom = Atom_new(atom_val, size_atom);
 
     if (atom == correct_atom)
     {
-        assert(Seq_length(newRow) == width);
+        printf("Printing Seq_length(newRow): %d\n", Seq_length(newRow));
+        printf("The width is: %d\n", width);
 
-        Seq_addhi(atom_sequence, atom);
+        //line 68 bellow
+        //assert(Seq_length(newRow) == width);
+
+        Seq_addhi(atom_sequence, (void *) atom);
         Seq_addhi(matrix, newRow);
     }
     else
@@ -71,31 +80,65 @@ int diff_nums_chars2(const char* line, char* correct_atom, Seq_T matrix,
     return fl;
 }
 
-void separate(const char* line, Seq_T newRow, char* atom_val)
+int separate(const char* line, Seq_T newRow, char* atom_val)
 {
-    assert(line != NULL);
-    assert(atom_val != NULL);
-
+    int capacity = 1001;
     char ch;
-    size_t size_atom = 0;
-    int capacity = 1001;  // Define capacity to enforce boundary checks
+    int size_atom = 0;
 
-    while ((ch = *line++) != '\0')
+    while ((ch = *line++) != '\n')
     {
         if (isdigit((unsigned char)ch)) 
         {
-            int* num = malloc(sizeof(int));  // Allocate memory for an int
-            if (!num) 
-            {
+            char *num = malloc(4);
+
+            if (!num) {
                 perror("Failed to allocate memory for num");
                 exit(1);
             }
-            *num = ch - '0';
-            Seq_addhi(newRow, num);
+
+            num[0] = ch;
+            int length = 1;
+
+            while ((ch = *line++) != '\n')
+            {
+                if (isdigit((unsigned char)ch))
+                {
+                    num[length] = ch;
+                    length++;
+                }
+                else
+                {        
+                    num[length] = '\0';                
+
+                    if (size_atom >= capacity - 1) 
+                    {  
+                        fprintf(stderr, "atom_val buffer overflow\n");
+                        exit(1);
+                    }
+                    atom_val[size_atom++] = ch;
+
+                    break;
+                }
+                   
+            }
+
+            int *number_ptr = malloc(sizeof(*number_ptr));
+            if (!number_ptr) {
+                perror("Failed to allocate memory for number_ptr");
+                exit(1);
+            }
+
+            *number_ptr = atoi(num);
+
+            assert (-1 < *number_ptr);
+            assert(*number_ptr < 256);
+
+            Seq_addhi(newRow, number_ptr);
         } 
         else 
-        {
-            if (size_atom >= (size_t)(capacity - 1)) 
+        {       
+            if (size_atom >= capacity - 1) 
             {  
                 fprintf(stderr, "atom_val buffer overflow\n");
                 exit(1);
@@ -104,17 +147,30 @@ void separate(const char* line, Seq_T newRow, char* atom_val)
         }
     }
     atom_val[size_atom] = '\0';
+    return size_atom;
 }
-
 
 int check_atoms(Seq_T atom_sequence, const char* atom)
 {
     
-    for (int i = 0; i < Seq_length(atom_sequence); i++) {
-        const char *current_atom = (const char *)Seq_get(atom_sequence, i);
+    for (int i = 0; i < Seq_length(atom_sequence) - 1; i++) {
+        const char *current_atom = Seq_get(atom_sequence, i);
+        // printf("\n");
+        // printf("i: %d\n", i);
+        // printf("%p\n", current_atom);
+        // printf("%p\n", atom);
         if (current_atom == atom)
+        {
+            // printf("Found the indices\n");
+
+            // printf("First index %d\n", i);
+
+            // printf("Second index %d\n", Seq_length(atom_sequence));
             return i;
+        }
+            
     }
+    // printf("returning %d", -1);
     return -1;
 }
 
@@ -135,24 +191,44 @@ Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index)
     return new_matrix;
 } 
 
+
 // For testing purposes
-void create_P2_file(Seq_T matrix)
+void printing_matrix(Seq_T matrix)
 {
-    for (size_t i = 0; i < (size_t)Seq_length(matrix); i++)  // Cast to size_t if Seq_length returns int
+    printf("Printing the matrix: \n");
+    for (size_t i = 0; i < (size_t)Seq_length(matrix); i++)
     {
         Seq_T row = (Seq_T)Seq_get(matrix, i);
         for (size_t j = 0; j < (size_t)Seq_length(row); j++) 
         {
             int *num_ptr = (int *)Seq_get(row, j);
             if (num_ptr) {
-                printf("%d ", *num_ptr);
+                if (j + 1 == (size_t)Seq_length(row))
+                    printf("%d", *num_ptr);
+                else
+                    printf("%d ", *num_ptr);
             } else {
                 printf("NULL ");
             }
         }
-        printf("\n");  // Newline after each row
+        printf("\n"); 
     }
-    printf("create_P2_file was successful\n");
+    //printf("create_P2_file was successful\n");
+}
+
+void printing_atom_seq(Seq_T atom_sequence)
+{
+    printf("Printing the atom_sequence: \n");
+    for (size_t j = 0; j < (size_t)Seq_length(atom_sequence); j++) 
+    {
+        char *str = Seq_get(atom_sequence, j);
+        if (str) {
+            printf("%s", str);
+        } else {
+            printf("NULL ");
+        }
+    }
+    printf("\n");
 }
 
 
