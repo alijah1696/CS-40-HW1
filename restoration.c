@@ -67,7 +67,7 @@ int diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix,
         printf("The width is: %d\n", width);
 
         //line 68 bellow
-        //assert(Seq_length(newRow) == width);
+        assert(Seq_length(newRow) == width);
 
         Seq_addhi(atom_sequence, (void *) atom);
         Seq_addhi(matrix, newRow);
