@@ -8,6 +8,24 @@
 #include "restoration.h"
 
 
+/*
+ * name:      diff_nums_chars1(const char *line, Seq_T matrix, 
+              Seq_T atom_sequence) (short for "differentiate between numbers and
+              other characters version 1")
+ * purpose:   using a helper function called separate, it differentiates
+              between numbers and injected characters. The numbers are stored 
+              inside a sequence called newRow, while the non-digit characters
+              are stored using atoms. Atoms were used because their 
+              implementation allows for easy comparrison between them, making 
+              them ideal to detect equalities between injected sequences.
+ * arguments: the line of text, a sequence of sequences of pointers to integers
+              (converted to binary for the final p5 file), and a sequence of 
+              atoms
+ * returns:   -1 if it did not find any 2 equal atoms in atom_sequence or the 
+ *            index at which the an identical atoms was found (chechk the 
+ *            implementation of check_atoms for more details)
+ * Author: Darius-Stefan Iavorschi
+ */
 int diff_nums_chars1(const char *line, Seq_T matrix, Seq_T atom_sequence)
 {
     assert(line != NULL);
@@ -39,7 +57,20 @@ int diff_nums_chars1(const char *line, Seq_T matrix, Seq_T atom_sequence)
 }
 
 
-
+/*
+ * name:      diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix, 
+                                                Seq_T atom_sequence, int width) (short for "differentiate between numbers and
+              other characters version 2")
+ * purpose:   using a helper function called separate, it differentiates
+              between numbers and injected characters. The difference between this function and diff_nums_chars1 is that 
+ * arguments: the line of text, a sequence of sequences of pointers to integers
+              (converted to binary for the final p5 file), and a sequence of 
+              atoms
+ * returns:   -1 if it did not find any 2 equal atoms in atom_sequence or the 
+ *            index at which the an identical atoms was found (chechk the 
+ *            implementation of check_atoms for more details)
+ * Author: Darius-Stefan Iavorschi
+ */
 int diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix, 
                                                 Seq_T atom_sequence, int width)
 {
@@ -88,6 +119,9 @@ int diff_nums_chars2(const char* line, const char* correct_atom, Seq_T matrix,
     return fl;
 }
 
+
+
+
 int separate(const char* line, Seq_T newRow, char* atom_val)
 {
     int capacity = 1001;
@@ -113,7 +147,7 @@ int separate(const char* line, Seq_T newRow, char* atom_val)
                 {
                     num[length] = ch;
                     length++;
-                    if (length >= 5) {
+                    if (length >= 5) { // It should not exceed 4 (3 digits plus the null character)
                         printf("Number exceeds 3 digits: %s\n", num);
                         free(num);
                         exit(1); 
@@ -166,6 +200,97 @@ int separate(const char* line, Seq_T newRow, char* atom_val)
     atom_val[size_atom] = '\0';
 
     return size_atom;
+}
+
+int construct_injected_sequence(const char* line, char* atom_val)
+{
+    int capacity = 1001;
+    char ch;
+    int size_atom = 0;
+
+    while ((ch = *line++) != '\n')
+    {
+        if (isdigit((unsigned char)ch)) 
+        {
+            continue;
+        } 
+        else 
+        {   
+            if (size_atom >= capacity - 1) 
+            {  
+                fprintf(stderr, "atom_val buffer overflow\n");
+                exit(1);
+            }
+            atom_val[size_atom++] = ch;
+        }
+    }
+    atom_val[size_atom] = '\0';
+
+    return size_atom;
+}
+
+
+
+void construct_newRow(const char* line, Seq_T newRow)
+{
+    char ch;
+
+    while ((ch = *line++) != '\n')
+    {
+        if (isdigit((unsigned char)ch)) 
+        {
+            char *num = malloc(4);
+            if (!num) {
+                perror("Failed to allocate memory for num\n");
+                exit(1);
+            }
+
+            num[0] = ch;
+            int length = 1;
+
+            while ((ch = *line++) != '\n')
+            {
+                if (isdigit((unsigned char)ch))
+                {
+                    num[length] = ch;
+                    length++;
+                    // It should not exceed 4 (3 digits plus the null character)
+                    if (length >= 5) { 
+                        printf("Number exceeds 3 digits: %s\n", num);
+                        free(num);
+                        exit(1); 
+                    }
+                }
+                else
+                {     
+                    num[length] = '\0';                
+                    break;
+                }
+            }
+
+            int *number_ptr = malloc(sizeof(*number_ptr));
+            if (!number_ptr) {
+                perror("Failed to allocate memory for number_ptr\n");
+                free(num);
+                exit(1);
+            }
+
+            *number_ptr = atoi(num);
+            free(num); 
+
+            //printf("The number_ptr value is %d\n", *number_ptr);
+
+            assert(-1 < *number_ptr);
+            assert(*number_ptr < 256);
+
+            Seq_addhi(newRow, number_ptr);
+
+            if (ch == '\n') {
+                break;
+            }
+        } 
+
+    }
 }
 
 
@@ -225,9 +350,14 @@ Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index)
 
 
 // For testing purposes
-void printing_matrix(Seq_T matrix)
+void printing_matrix_to_file(Seq_T matrix, const char *filename)
 {
-    printf("Printing the matrix: \n");
+    FILE *file = fopen(filename, "w"); // Open file in write mode
+    if (file == NULL) {
+        printf("Error opening file: %s\n", filename);
+        return;
+    }
+
     for (size_t i = 0; i < (size_t)Seq_length(matrix); i++)
     {
         Seq_T row = (Seq_T)Seq_get(matrix, i);
@@ -242,10 +372,11 @@ void printing_matrix(Seq_T matrix)
             } else {
                 printf("NULL ");
             }
-        }
-        printf("\n"); 
+        } 
     }
-    //printf("create_P2_file was successful\n");
+
+    // fprintf(file, "create_P2_file was successful\n");
+    fclose(file); // Close the file
 }
 
 void printing_atom_seq(Seq_T atom_sequence)
