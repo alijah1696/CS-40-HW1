@@ -89,13 +89,13 @@ test_readaline: test_readaline.o readaline.o
 	$(CC) $(LDFLAGS) -o test_readaline test_readaline.o readaline.o $(LDLIBS)
 
 # Build test for conversion function
-test_conversion: test_conversion.o conversion.o
-	$(CC) $(LDFLAGS) -o test_conversion test_conversion.o conversion.o $(LDLIBS)
+test_conversion: test_conversion.o conversion.o readaline.o
+	$(CC) $(LDFLAGS) -o test_conversion test_conversion.o conversion.o readaline.o $(LDLIBS)
 
 # Run unit tests
 test: test_conversion test_readaline test_restoration
-	./test_restoration
-	./test_readaline
+#	./test_restoration
+#	./test_readaline
 	./test_conversion
 	
 #

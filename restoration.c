@@ -245,7 +245,6 @@ void printing_matrix(Seq_T matrix)
         }
         printf("\n"); 
     }
-    //printf("create_P2_file was successful\n");
 }
 
 void printing_atom_seq(Seq_T atom_sequence)

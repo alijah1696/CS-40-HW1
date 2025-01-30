@@ -9,4 +9,6 @@ void writeP5Header(int width, int height, FILE *file);
 
 void writeRowToBinary(Seq_T pixelRow, FILE *file);
 
+Seq_T convert_line_to_sequence(const char *line);
+
 #endif
