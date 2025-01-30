@@ -49,10 +49,12 @@ We will use the readaline function to read the corrupted file line by line. The 
 
 Now that we know the correct sequence of characters with which the original lines have been injected, we simply need to check every corrupted line individually and store the numbers in matrix_nums if the sequence matches. 
 
-Data structures used:
-Seq_T atom_sequence: Represents a sequence of atoms. The first step 
 
-All data structures are allocated dynamically so that they can be resized.
+Data structures used:
+Seq_T atom_sequence: Represents a sequence of atoms. The first step is establishing the correct sequence of characters the original lines have been injected with. We add a new atom to the sequence until we find identical atoms.
+Seq_T newRow: representing a sequence of numbers...
+Seq_T: representing a sequence of newRows
+
 
 
 Implementations:
