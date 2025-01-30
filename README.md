@@ -1,4 +1,7 @@
 # CS-40-HW1
+Darius-Stefan Iavorschi (diavor01)
+->
+
 filesofpix Assignment
 
 
@@ -14,6 +17,7 @@ Assumptions:
   Input - 
     Injected rows and original rows can be differentiated by their infusion sequence of non-digit bytes.
     Images are atleast a 2x2 grid
+    The input can come from both stdin or from a file
   Corruption -
     The corrupted images originate from "plain" PGM files(P2)
     Each original row is terminated by a newline character (\n) that remains unchanged.
@@ -23,6 +27,18 @@ Constraints:
   The restoration program should process even large images efficiently under 20 seconds
   Hanson’s data structures are available and must be used when appropriate(except for arrays)
 
+Hanson's data abstractions used and their purposes:
+1) Sequences
+   Purposes: -> they can store data sequentially
+             -> they can resize dynamically
+2) Atoms
+   Purpose: -> they allow for atom equality, which is essential for comparing the injected sequences
+   
+File Descriptions:
+-> main.c: checks the type of input received and passes it on to the restoration function
+-> readaline.c and its header file: reads a corrupted line of text at a time. A line can contain any ASCII characters (including NULL) and is guaranteed to end with "\n"
+-> functions.c and its header file: represent helper functions for the restoration function
+-> restoration.c and its header file: the file responsible for the restoration process from a corrupted plain file to a p5 pgm file
 
 Architecture:
 For readaline, we will be using a pointer to char called buffer to store the characters. Buffer stops receiving input when finding the endline character. 
@@ -33,40 +49,8 @@ We will use the readaline function to read the corrupted file line by line. The 
 
 Now that we know the correct sequence of characters with which the original lines have been injected, we simply need to check every corrupted line individually and store the numbers in matrix_nums if the sequence matches. 
 
-Pseudocode overview:
-
-//func to separate numbers from characters
-while ( reading ch from the corrupted line):
-	char* seq_chars = NULL
-
-	if ch is digit:
-		append ch to matrix_nums[size_matrix][i]
-		i++
-	else:
-		append ch to seq_chars
-	
-	atoms[size_atoms] = Atom_string(seq_chars)
-	size_atoms++
-	
-
-
-//func to check equal sequences
-for (i: 0 -> size_atoms-1):
-	for (j: i+1 -> size_atoms):
-		if atoms[i] == atoms[j]
-			found the correct sequence of characters, return [i, j], delete all rows besides i and j
-
-return [-1, -1]
-
-
-
-In the end, matrix_nums should represent the original file, which can safely be converted to a binary format.
-
-
 Data structures used:
-- char* buffer
-- int** matrix_nums
-- char* atoms (its elements will be initialized with atoms[x] = Atom_string("sequence_of_injected_characters")
+Seq_T atom_sequence: Represents a sequence of atoms. The first step 
 
 All data structures are allocated dynamically so that they can be resized.
 
