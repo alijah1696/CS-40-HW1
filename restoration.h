@@ -20,8 +20,11 @@ int check_atoms(Seq_T atom_sequence, const char* atom);
 Seq_T correct_matrix(Seq_T matrix, int size_matrix, int index);
 
 //For testing
-void printing_matrix(Seq_T matrix);
+void printing_matrix_to_file(Seq_T matrix, const char *filename);
 void printing_atom_seq(Seq_T row);
+
+int construct_injected_sequence(const char* line, char* atom_val);
+void construct_newRow(const char* line, Seq_T newRow);
 
 #endif
 
