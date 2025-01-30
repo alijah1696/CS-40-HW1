@@ -9,7 +9,6 @@
 
 size_t readaline(FILE *inputfd, char **datapp) {
     if (inputfd == NULL || datapp == NULL) {
-
         fprintf(stderr, "readaline: invalid argument\n");
         exit(EXIT_FAILURE);
     }
@@ -30,6 +29,7 @@ size_t readaline(FILE *inputfd, char **datapp) {
         if (length > 1000)
         {
             fprintf(stderr, "readaline: input line too long\n");
+            free(buffer);
             exit(4);
         }
     
@@ -38,8 +38,12 @@ size_t readaline(FILE *inputfd, char **datapp) {
         if (ch == '\n') {
             break;
         }
+    }
 
-
+    if (ch == EOF && ferror(inputfd)) {
+        fprintf(stderr, "readaline: error reading from file\n");
+        free(buffer);
+        exit(EXIT_FAILURE);
     }
 
     if (length == 0) 
@@ -49,21 +53,8 @@ size_t readaline(FILE *inputfd, char **datapp) {
         return 0;
     }
 
-
-    if (length >= capacity) {
-        unsigned char *temp = realloc(buffer, capacity + 1);
-        if (!temp) {
-            free(buffer);
-            fprintf(stderr, "readaline: memory (re)allocation failed\n");
-            exit(EXIT_FAILURE);
-        }
-        buffer = temp;
-        capacity++;
-    }
-    // buffer[length] = '\0';
-
     *datapp = (char *)buffer;
-    return length - 1;
+    return length;
 }
 
         // if (length >= capacity) {
@@ -90,3 +81,4 @@ size_t readaline(FILE *inputfd, char **datapp) {
 
 //     return new_buff;
 // }
+
